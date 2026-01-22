@@ -260,5 +260,3 @@ self.addEventListener('message', (event) => {
   }
 });
 
-export {};
-

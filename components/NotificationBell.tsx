@@ -64,12 +64,20 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
   // Play notification sound
   const playNotificationSound = () => {
     try {
+      // Skip sound if it's known to be blocked or missing
+      const soundBlocked = localStorage.getItem('notification-sound-blocked');
+      if (soundBlocked === 'true') {
+        return;
+      }
+      
       if (!audioRef.current) {
         audioRef.current = new Audio('/sounds/notification.mp3');
         audioRef.current.volume = 0.5;
       }
-      audioRef.current.play().catch(() => {
-        // Autoplay might be blocked
+      audioRef.current.play().catch((error) => {
+        // Mark as blocked to avoid repeated attempts
+        console.log('[Notification] Sound blocked or missing:', error.message);
+        localStorage.setItem('notification-sound-blocked', 'true');
       });
     } catch {
       // Ignore errors
