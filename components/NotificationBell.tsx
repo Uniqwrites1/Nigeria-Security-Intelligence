@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Bell, X } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import useSWR from 'swr';
 import { ClusteredIncident } from '@/types/security';
 import { useToast } from '@/hooks/use-toast';
@@ -16,7 +16,7 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<ClusteredIncident[]>([]);
-  const [lastReadId, setLastReadId] = useState<string | null>(null);
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -26,11 +26,18 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
     revalidateOnFocus: true,
   });
 
-  // Initialize with saved last read ID
+  // Initialize with saved read IDs
   useEffect(() => {
-    const saved = localStorage.getItem('notification-last-read-id');
+    const saved = localStorage.getItem('notification-read-ids');
     if (saved) {
-      setLastReadId(saved);
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setReadIds(new Set(parsed));
+        }
+      } catch {
+        // Ignore parse errors
+      }
     }
   }, []);
 
@@ -40,7 +47,7 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
 
     const incidents = data.data as ClusteredIncident[];
     const newIncidents = incidents.filter(
-      (inc) => inc.id !== lastReadId && inc.severity !== 'low'
+      (inc) => !readIds.has(inc.id) && inc.severity !== 'low'
     );
 
     // Update notifications list
@@ -51,7 +58,7 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
     setUnreadCount(newCount);
 
     // Play sound for new critical/high incidents
-    if (newCount > 0 && lastReadId !== null) {
+    if (newCount > 0 && readIds.size > 0) {
       const criticalNew = newIncidents.filter(
         (inc) => inc.severity === 'critical' || inc.severity === 'high'
       );
@@ -59,7 +66,7 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
         playNotificationSound();
       }
     }
-  }, [data, lastReadId, maxNotifications]);
+  }, [data, readIds, maxNotifications]);
 
   // Play notification sound
   const playNotificationSound = () => {
@@ -84,12 +91,22 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
     }
   };
 
-  // Mark as read
-  const markAsRead = () => {
+  // Mark single notification as read
+  const markAsRead = (incidentId: string) => {
+    const newReadIds = new Set(readIds);
+    newReadIds.add(incidentId);
+    setReadIds(newReadIds);
+    localStorage.setItem('notification-read-ids', JSON.stringify([...newReadIds]));
+    setIsOpen(false);
+  };
+
+  // Mark all as read
+  const markAllAsRead = () => {
     if (notifications.length > 0) {
-      const latestId = notifications[0].id;
-      setLastReadId(latestId);
-      localStorage.setItem('notification-last-read-id', latestId);
+      const newReadIds = new Set(readIds);
+      notifications.forEach((inc) => newReadIds.add(inc.id));
+      setReadIds(newReadIds);
+      localStorage.setItem('notification-read-ids', JSON.stringify([...newReadIds]));
       setUnreadCount(0);
     }
     setIsOpen(false);
@@ -98,13 +115,20 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
   // Clear all notifications
   const clearNotifications = () => {
     if (notifications.length > 0) {
-      const latestId = notifications[0].id;
-      setLastReadId(latestId);
-      localStorage.setItem('notification-last-read-id', latestId);
+      const newReadIds = new Set(readIds);
+      notifications.forEach((inc) => newReadIds.add(inc.id));
+      setReadIds(newReadIds);
+      localStorage.setItem('notification-read-ids', JSON.stringify([...newReadIds]));
     }
     setNotifications([]);
     setUnreadCount(0);
     setIsOpen(false);
+  };
+
+  // Clear all read IDs (reset)
+  const clearAllReadIds = () => {
+    setReadIds(new Set());
+    localStorage.removeItem('notification-read-ids');
   };
 
   // Refresh notifications
@@ -165,12 +189,21 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
               <button
                 onClick={refresh}
                 className="text-xs text-blue-400 hover:text-blue-300"
+                title="Refresh notifications"
               >
                 Refresh
               </button>
               <button
+                onClick={clearAllReadIds}
+                className="text-xs text-gray-400 hover:text-gray-300"
+                title="Reset all read notifications"
+              >
+                Reset
+              </button>
+              <button
                 onClick={clearNotifications}
                 className="text-xs text-red-400 hover:text-red-300"
+                title="Clear current notifications"
               >
                 Clear
               </button>
@@ -185,7 +218,7 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-4 text-center text-gray-400 text-sm">
-                No new notifications
+                {unreadCount > 0 ? 'No new notifications' : 'All caught up!'}
               </div>
             ) : (
               <div className="divide-y divide-gray-800">
@@ -193,9 +226,7 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
                   <div
                     key={incident.id}
                     className="p-3 hover:bg-gray-800 transition-colors cursor-pointer"
-                    onClick={() => {
-                      window.location.href = `/?incident=${incident.id}`;
-                    }}
+                    onClick={() => markAsRead(incident.id)}
                   >
                     <div className="flex items-start gap-2">
                       <span
@@ -231,7 +262,7 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
           {notifications.length > 0 && (
             <div className="p-2 border-t border-gray-700 text-center">
               <button
-                onClick={markAsRead}
+                onClick={markAllAsRead}
                 className="text-xs text-blue-400 hover:text-blue-300"
               >
                 Mark all as read
