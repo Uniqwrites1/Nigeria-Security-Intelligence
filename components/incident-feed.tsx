@@ -104,11 +104,6 @@ function IncidentCard({ incident }: { incident: ClusteredIncident }) {
               </span>
             </div>
           )}
-
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Shield className="w-4 h-4" />
-            <span className="capitalize">{incident.confidence} confidence</span>
-          </div>
         </div>
 
         {primaryIncident.tags.length > 0 && (

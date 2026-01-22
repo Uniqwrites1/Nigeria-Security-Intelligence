@@ -8,8 +8,8 @@ const DYNAMIC_CACHE = 'dynamic-v1';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  '/icons/icon-192x192.svg',
+  '/icons/icon-512x512.svg',
 ];
 
 // Cache strategies
@@ -189,8 +189,8 @@ self.addEventListener('push', (event) => {
   
   const options = {
     body: data.body || 'New security update available',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/badge-72x72.png',
+    icon: '/icons/icon-192x192.svg',
+    badge: '/icons/icon-72x72.svg',
     vibrate: [200, 100, 200, 100, 200],
     tag: data.tag || 'security-notification',
     renotify: true,

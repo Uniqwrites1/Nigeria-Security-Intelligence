@@ -52,7 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#dc2626" />
         <meta name="msapplication-tap-highlight" content="no" />
@@ -63,7 +63,7 @@ export default function RootLayout({
         <PWAInstallPrompt 
           title="Install Security Intel App"
           description="Get real-time security alerts and access the dashboard offline by installing our app."
-          delay={15000}
+          delay={3000}
         />
         <NotificationToast />
       </body>

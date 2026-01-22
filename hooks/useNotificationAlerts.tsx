@@ -174,16 +174,17 @@ export function useNotificationAlerts({
     // Process the new incident
     lastIncidentIdRef.current = mostRecent.id;
 
-    // Show notifications
+    // Show in-app notification (works without any backend!)
     showInAppNotification(mostRecent);
     
-    if (isPermissionGranted) {
-      await showPushNotification(mostRecent);
-    }
-
-    // Play sound for high severity and critical
+    // Play sound for high severity and critical (works without backend!)
     if (mostRecent.severity === 'critical' || mostRecent.severity === 'high') {
       playNotificationSound(mostRecent.severity);
+    }
+
+    // Show push notification only if permission granted
+    if (isPermissionGranted) {
+      await showPushNotification(mostRecent);
     }
 
     // Call callback
