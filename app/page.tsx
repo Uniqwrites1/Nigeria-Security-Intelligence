@@ -10,7 +10,8 @@ import { IncidentFilters } from '@/components/incident-filters';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { useNotificationAlerts } from '@/hooks/useNotificationAlerts';
 import { Button } from '@/components/ui/button';
-import { Shield, RefreshCw, Bell, Check, Sun, Moon, ChevronDown, ChevronUp } from 'lucide-react';
+import { Shield, RefreshCw, Check, Sun, Moon, ChevronDown, ChevronUp, Bell } from 'lucide-react';
+import { NotificationBell } from '@/components/NotificationBell';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -43,7 +44,7 @@ export default function Home() {
   });
 
   // Initialize notification alerts
-  const { refresh: refreshAlerts, isLoading: isAlertsLoading } = useNotificationAlerts({
+  const { refresh: refreshAlerts } = useNotificationAlerts({
     enabled: true,
     alertConfig: {
       enabled: true,
@@ -186,10 +187,12 @@ export default function Home() {
 
               <NotificationSettings />
 
+              <NotificationBell />
+
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="border-border relative"
+                className="border-border"
                 onClick={() => {
                   // Scroll to incidents feed
                   const feed = document.getElementById('incidents-feed');
@@ -199,10 +202,7 @@ export default function Home() {
                 }}
               >
                 <Bell className="w-4 h-4 mr-2" />
-                Alerts
-                {isAlertsLoading && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
-                )}
+                Feed
               </Button>
             </div>
           </div>
