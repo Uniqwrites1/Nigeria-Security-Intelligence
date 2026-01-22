@@ -10,7 +10,7 @@ import { IncidentFilters } from '@/components/incident-filters';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { useNotificationAlerts } from '@/hooks/useNotificationAlerts';
 import { Button } from '@/components/ui/button';
-import { Shield, RefreshCw, Check, Sun, Moon, ChevronDown, ChevronUp, Bell } from 'lucide-react';
+import { Shield, RefreshCw, Check, Sun, Moon, ChevronDown, ChevronUp } from 'lucide-react';
 import { NotificationBell } from '@/components/NotificationBell';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 
@@ -190,22 +190,6 @@ export default function Home() {
               <NotificationSettings />
 
               <NotificationBell />
-
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-border"
-                onClick={() => {
-                  // Scroll to incidents feed
-                  const feed = document.getElementById('incidents-feed');
-                  if (feed) {
-                    feed.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-              >
-                <Bell className="w-4 h-4 mr-2" />
-                Feed
-              </Button>
             </div>
           </div>
         </div>
