@@ -92,7 +92,7 @@ export interface AlertConfig {
   threatTypes: ThreatType[];
   minSeverity: SeverityLevel;
   states: string[];
-  notificationTypes: ('browser' | 'email' | 'webhook')[];
+  notificationTypes: ('browser' | 'email' | 'webhook' | 'sound')[];
   webhookUrl?: string;
 }
 

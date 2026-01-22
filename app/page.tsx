@@ -50,6 +50,8 @@ export default function Home() {
       enabled: true,
       threatTypes: ['terrorism', 'banditry', 'kidnapping', 'insurgency', 'armed_attack'],
       minSeverity: 'high',
+      states: [],
+      notificationTypes: ['browser'],
     },
   });
 

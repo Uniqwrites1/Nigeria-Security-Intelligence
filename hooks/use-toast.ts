@@ -3,7 +3,13 @@
 // Inspired by react-hot-toast library
 import * as React from 'react';
 
-import type { ToastActionElement, ToastProps } from '@/components/ui/toast';
+import type { ToastActionElement } from '@/components/ui/toast';
+import type { ToastProps as BaseToastProps } from '@/components/ui/toast';
+
+type ToastProps = BaseToastProps & {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+};
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
@@ -13,6 +19,9 @@ type ToasterToast = ToastProps & {
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: ToastActionElement;
+} & {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
 };
 
 const actionTypes = {
@@ -137,7 +146,10 @@ function dispatch(action: Action) {
   });
 }
 
-type Toast = Omit<ToasterToast, 'id'>;
+type Toast = Omit<ToasterToast, 'id'> & {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+};
 
 function toast({ ...props }: Toast) {
   const id = genId();

@@ -117,7 +117,7 @@ export function NotificationToast({
                 {incident.threatType.replace('_', ' ')}
               </Badge>
             </div>
-          ),
+          ) as any,
           description: (
             <div className="mt-2 space-y-2">
               <p className="font-medium text-foreground line-clamp-2">
@@ -136,7 +136,7 @@ export function NotificationToast({
                 </span>
               </div>
             </div>
-          ),
+          ) as any,
           variant: incident.severity === 'critical' ? 'destructive' : 'default',
           duration: incident.severity === 'critical' ? 10000 : 6000,
         });
@@ -154,23 +154,23 @@ export function NotificationToast({
   return (
     <ToastProvider>
       <div className={cn('z-[100] m-4 space-y-2', positionClasses[position])}>
-        {toasts.map((toast) => (
+        {toasts.map((toastItem) => (
           <Toast 
-            key={toast.id} 
-            {...toast}
+            key={toastItem.id} 
+            {...toastItem}
             className={cn(
               'w-[350px] shadow-lg',
               // Add custom styling for severity
-              toast.variant === 'destructive' && 'border-l-4 border-l-red-500'
+              toastItem.variant === 'destructive' && 'border-l-4 border-l-red-500'
             )}
           >
             <div className="grid gap-1">
-              <ToastTitle>{toast.title}</ToastTitle>
-              {toast.description && (
-                <ToastDescription>{toast.description}</ToastDescription>
+              <ToastTitle>{toastItem.title}</ToastTitle>
+              {toastItem.description && (
+                <ToastDescription>{toastItem.description}</ToastDescription>
               )}
             </div>
-            {toast.action}
+            {toastItem.action}
             <ToastClose />
           </Toast>
         ))}
@@ -193,4 +193,3 @@ function Badge({ className, children }: { className?: string; children: React.Re
 }
 
 export default NotificationToast;
-

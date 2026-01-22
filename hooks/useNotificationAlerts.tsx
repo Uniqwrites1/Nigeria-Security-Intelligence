@@ -2,9 +2,10 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import useSWR from 'swr';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
-import { ClusteredIncident, AlertConfig, ThreatType, SeverityLevel } from '@/types/security';
 import { useToast } from '@/hooks/use-toast';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { ClusteredIncident, SeverityLevel, AlertConfig, ThreatType } from '@/types/security';
+import { ToastAction } from '@/components/ui/toast';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -29,7 +30,7 @@ export function useNotificationAlerts({
   // Default alert config
   const defaultAlertConfig: AlertConfig = {
     enabled: true,
-    threatTypes: ['terrorism', 'banditry', 'kidnapping', 'insurgency', 'armed_attack'],
+    threatTypes: ['terrorism', 'banditry', 'kidnapping', 'insurgency', 'armed_attack'] as ThreatType[],
     minSeverity: 'high',
     states: [],
     notificationTypes: ['browser'],
@@ -93,7 +94,7 @@ export function useNotificationAlerts({
     }
 
     return true;
-  }, []);
+  }, [defaultAlertConfig]);
 
   // Show in-app notification
   const showInAppNotification = useCallback((incident: ClusteredIncident) => {
@@ -108,7 +109,7 @@ export function useNotificationAlerts({
           }`} />
           <span>{incident.severity.toUpperCase()}: {incident.threatType.replace('_', ' ')}</span>
         </div>
-      ),
+      ) as any,
       description: (
         <div className="mt-2">
           <p className="font-semibold">{incident.title}</p>
@@ -121,17 +122,21 @@ export function useNotificationAlerts({
             {new Date(incident.lastUpdated).toLocaleString()}
           </p>
         </div>
-      ),
+      ) as any,
       variant: incident.severity === 'critical' ? 'destructive' : 'default',
       duration: incident.severity === 'critical' ? 10000 : 5000,
-      action: config.notificationTypes.includes('browser') ? {
-        label: 'View Details',
-        onClick: () => {
-          window.location.href = `/?incident=${incident.id}`;
-        },
-      } : undefined,
+      action: config.notificationTypes.includes('browser') ? (
+        <ToastAction 
+          altText="View incident details"
+          onClick={() => {
+            window.location.href = `/?incident=${incident.id}`;
+          }}
+        >
+          View Details
+        </ToastAction>
+      ) : undefined,
     });
-  }, [toast]);
+  }, [toast, defaultAlertConfig]);
 
   // Show browser push notification
   const showPushNotification = useCallback(async (incident: ClusteredIncident) => {
@@ -264,7 +269,7 @@ export function useAlertConfig() {
 export function getDefaultConfig(): AlertConfig {
   return {
     enabled: true,
-    threatTypes: ['terrorism', 'banditry', 'kidnapping', 'insurgency', 'armed_attack'],
+    threatTypes: ['terrorism', 'banditry', 'kidnapping', 'insurgency', 'armed_attack'] as ThreatType[],
     minSeverity: 'high',
     states: [],
     notificationTypes: ['browser'],
@@ -272,4 +277,3 @@ export function getDefaultConfig(): AlertConfig {
 }
 
 export default useNotificationAlerts;
-
