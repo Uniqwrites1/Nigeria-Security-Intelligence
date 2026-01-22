@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { Button } from '@/components/ui/button';
 import { 
@@ -38,24 +38,29 @@ export function PWAInstallPrompt({
   const { isInstallable, isInstalled, isPromptActive, triggerInstall, dismissPrompt } = usePWAInstall();
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const [hasDelayed, setHasDelayed] = useState(false);
+  const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
 
-  // Don't show if already installed or not installable
-  if (isInstalled || !isInstallable) {
+  // Don't show if already installed
+  if (isInstalled) {
     return null;
   }
 
-  // Auto-show after delay
-  if (!isPromptActive && !hasDelayed) {
-    setTimeout(() => {
-      setHasDelayed(true);
-      setIsOpen(true);
-    }, delay);
-    return null;
-  }
+  // Auto-show after delay if not manually closed and has installability
+  useEffect(() => {
+    if (!hasManuallyClosed && !isOpen && !isInstalled) {
+      const timer = setTimeout(() => {
+        // Check if manifest is valid and prompt can be shown
+        if (isInstallable || isPromptActive) {
+          setIsOpen(true);
+        }
+      }, delay);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [delay, hasManuallyClosed, isOpen, isInstalled, isInstallable, isPromptActive]);
 
-  // Don't show if prompt was dismissed
-  if (!isPromptActive && !isOpen) {
+  // Don't show if prompt was dismissed (only for manual dismiss)
+  if (hasManuallyClosed && !isOpen) {
     return null;
   }
 
@@ -68,6 +73,7 @@ export function PWAInstallPrompt({
 
   const handleDismiss = () => {
     setIsOpen(false);
+    setHasManuallyClosed(true);
     dismissPrompt();
   };
 
@@ -159,19 +165,20 @@ export function PWAInstallPrompt({
 export function PWAInstallBanner({ position = 'bottom' }: { position?: 'bottom' | 'top' }) {
   const { isInstallable, isInstalled, isPromptActive, triggerInstall, dismissPrompt } = usePWAInstall();
   const [isVisible, setIsVisible] = useState(false);
+  const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
 
-  if (isInstalled || !isInstallable) {
+  if (isInstalled) {
     return null;
   }
 
   // Show after user interaction
   const handleInteraction = () => {
-    if (isPromptActive) {
+    if ((isPromptActive || isInstallable) && !hasManuallyClosed) {
       setIsVisible(true);
     }
   };
 
-  if (!isVisible || !isPromptActive) {
+  if (!isVisible || hasManuallyClosed) {
     return null;
   }
 
@@ -200,6 +207,7 @@ export function PWAInstallBanner({ position = 'bottom' }: { position?: 'bottom' 
               size="sm"
               onClick={() => {
                 dismissPrompt();
+                setHasManuallyClosed(true);
                 setIsVisible(false);
               }}
             >

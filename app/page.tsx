@@ -9,8 +9,9 @@ import { IncidentFeed } from '@/components/incident-feed';
 import { IncidentFilters } from '@/components/incident-filters';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { useNotificationAlerts } from '@/hooks/useNotificationAlerts';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { Button } from '@/components/ui/button';
-import { Shield, RefreshCw, Check, Sun, Moon, ChevronDown, ChevronUp } from 'lucide-react';
+import { Shield, RefreshCw, Check, Sun, Moon, ChevronDown, ChevronUp, Download } from 'lucide-react';
 import { NotificationBell } from '@/components/NotificationBell';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 
@@ -38,6 +39,8 @@ export default function Home() {
   const [statsOpen, setStatsOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
 
+  const { isInstallable, isInstalled, triggerInstall } = usePWAInstall();
+  
   const { data, error, isLoading, mutate } = useSWR('/api/news?limit=100', fetcher, {
     refreshInterval: 60000,
     revalidateOnFocus: true,
@@ -91,6 +94,10 @@ export default function Home() {
       document.documentElement.classList.add('light');
       localStorage.setItem('theme', 'light');
     }
+  };
+
+  const handleInstall = async () => {
+    await triggerInstall();
   };
 
   const incidents: ClusteredIncident[] = data?.data || [];
@@ -190,6 +197,20 @@ export default function Home() {
               <NotificationSettings />
 
               <NotificationBell />
+
+              {/* Manual Install Button - Fallback for when automatic prompt doesn't show */}
+              {isInstallable && !isInstalled && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleInstall}
+                  className="border-border"
+                  title="Install app"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Install
+                </Button>
+              )}
             </div>
           </div>
         </div>

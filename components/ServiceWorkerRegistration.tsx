@@ -19,9 +19,6 @@ export function ServiceWorkerRegistration() {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   // New content is available
                   console.log('[SW] New content available, refresh needed');
-                  
-                  // Optionally show update notification
-                  // You could emit an event or update a state
                 }
               });
             }
