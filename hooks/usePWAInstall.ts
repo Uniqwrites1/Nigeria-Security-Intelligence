@@ -35,16 +35,16 @@ export function usePWAInstall(): PWAInstallState {
 
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevent the default browser prompt
-      e.preventDefault();
-      
+      // Store the event for manual triggering, but don't prevent default
+      // This allows the browser's automatic prompt to show
+
       // Check if user has already dismissed or installed
       const dismissed = localStorage.getItem('pwa-install-dismissed');
       if (dismissed) {
         const dismissedDate = new Date(dismissed);
         const now = new Date();
         const daysSinceDismissed = (now.getTime() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
-        
+
         // Only show again after 7 days
         if (daysSinceDismissed < 7) {
           return;
