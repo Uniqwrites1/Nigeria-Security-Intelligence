@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning={true}>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -51,7 +51,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <meta name="theme-color" content="#dc2626" />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <ServiceWorkerRegistration />
         {children}
         <PWAInstallPrompt 
