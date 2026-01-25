@@ -160,6 +160,11 @@ export function usePushNotifications(): PushNotificationState {
 
 // Helper function to convert VAPID key
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  // Only run in browser environment
+  if (typeof window === 'undefined') {
+    return new Uint8Array([]);
+  }
+  
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding)
     .replace(/-/g, '+')
