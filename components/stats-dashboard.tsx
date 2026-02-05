@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { ClusteredIncident, ThreatType, SeverityLevel } from '@/types/security';
 import { Card } from '@/components/ui/card';
 import { AlertTriangle, Users, MapPin, TrendingUp } from 'lucide-react';
@@ -9,22 +10,23 @@ interface StatsDashboardProps {
 }
 
 export function StatsDashboard({ incidents }: StatsDashboardProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const totalIncidents = incidents.length;
-
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
-
   const totalCasualties = incidents.reduce((sum, incident) => {
     const casualties = incident.primaryIncident.casualties;
     return sum + (casualties?.killed || 0) + (casualties?.injured || 0);
   }, 0);
-
   const affectedStates = new Set(incidents.filter((i) => i.state).map((i) => i.state)).size;
-
   const threatTypeCounts = incidents.reduce((acc, incident) => {
     acc[incident.threatType] = (acc[incident.threatType] || 0) + 1;
     return acc;
   }, {} as Record<ThreatType, number>);
-
   const topThreat = Object.entries(threatTypeCounts).sort(([, a], [, b]) => b - a)[0];
 
   return (
@@ -32,7 +34,7 @@ export function StatsDashboard({ incidents }: StatsDashboardProps) {
       <StatCard
         title="Total Incidents"
         value={totalIncidents}
-        icon={<AlertTriangle className="w-5 h-5" />}
+        icon={mounted && <AlertTriangle className="w-5 h-5" />}
         trend="+12% from yesterday"
         color="blue"
       />
@@ -40,15 +42,15 @@ export function StatsDashboard({ incidents }: StatsDashboardProps) {
       <StatCard
         title="Critical Alerts"
         value={criticalIncidents}
-        icon={<AlertTriangle className="w-5 h-5" />}
-        trend={`${((criticalIncidents / totalIncidents) * 100).toFixed(1)}% of total`}
+        icon={mounted && <AlertTriangle className="w-5 h-5" />}
+        trend={`${totalIncidents > 0 ? ((criticalIncidents / totalIncidents) * 100).toFixed(1) : 0}% of total`}
         color="red"
       />
 
       <StatCard
         title="Total Casualties"
         value={totalCasualties}
-        icon={<Users className="w-5 h-5" />}
+        icon={mounted && <Users className="w-5 h-5" />}
         trend="Killed + Injured"
         color="orange"
       />
@@ -56,8 +58,8 @@ export function StatsDashboard({ incidents }: StatsDashboardProps) {
       <StatCard
         title="Affected States"
         value={affectedStates}
-        icon={<MapPin className="w-5 h-5" />}
-        trend={`${topThreat ? getThreatTypeLabel(topThreat[0] as ThreatType) : 'N/A'} most common`}
+        icon={mounted && <MapPin className="w-5 h-5" />}
+        trend={topThreat ? `${getThreatTypeLabel(topThreat[0] as ThreatType)} most common` : 'N/A'}
         color="purple"
       />
     </div>

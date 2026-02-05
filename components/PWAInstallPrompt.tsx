@@ -37,11 +37,21 @@ export function PWAInstallPrompt({
 }: PWAInstallPromptProps) {
   const { isInstallable, isInstalled, isPromptActive, triggerInstall, dismissPrompt } = usePWAInstall();
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Don't show if already installed
   if (isInstalled) {
+    return null;
+  }
+
+  // Don't render until mounted (hydration safety)
+  if (!mounted) {
     return null;
   }
 

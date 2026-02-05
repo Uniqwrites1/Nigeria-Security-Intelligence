@@ -11,9 +11,10 @@ import { NotificationSettings } from '@/components/NotificationSettings';
 import { useNotificationAlerts } from '@/hooks/useNotificationAlerts';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { Button } from '@/components/ui/button';
-import { Shield, RefreshCw, Check, Sun, Moon, ChevronDown, ChevronUp, Download } from 'lucide-react';
+import { HeaderIcons, LogoIcon } from '@/components/header-icons';
 import { NotificationBell } from '@/components/NotificationBell';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+import { RefreshCw, ChevronUp, ChevronDown } from 'lucide-react';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -152,9 +153,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-600 rounded-lg">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
+              <LogoIcon />
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Nigeria Security Intelligence</h1>
                 <p className="text-sm text-muted-foreground">Real-time security monitoring across all 36 states + FCT</p>
@@ -162,55 +161,21 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={toggleTheme}
-                className="border-border"
-              >
-                {isDarkMode ? (
-                  <Sun className="w-4 h-4" />
-                ) : (
-                  <Moon className="w-4 h-4" />
-                )}
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={isLoading || isRefreshing}
-                className={`border-border transition-all ${
-                  refreshComplete ? 'bg-green-50 border-green-300 text-green-700 dark:bg-green-900/20 dark:border-green-700' : ''
-                }`}
-              >
-                {isRefreshing ? (
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                ) : refreshComplete ? (
-                  <Check className="w-4 h-4 mr-2" />
-                ) : (
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                )}
-                {isRefreshing ? 'Refreshing...' : refreshComplete ? 'Updated!' : 'Refresh'}
-              </Button>
-
-              <NotificationSettings />
-
-              <NotificationBell />
-
-              {/* Manual Install Button - Fallback for when automatic prompt doesn't show */}
-              {isInstallable && !isInstalled && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleInstall}
-                  className="border-border"
-                  title="Install app"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Install
-                </Button>
-              )}
+              <HeaderIcons
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isLoading={isLoading}
+                isRefreshing={isRefreshing}
+                refreshComplete={refreshComplete}
+                handleRefresh={handleRefresh}
+                isInstallable={isInstallable}
+                isInstalled={isInstalled}
+                handleInstall={handleInstall}
+                statsOpen={statsOpen}
+                setStatsOpen={setStatsOpen}
+                mapOpen={mapOpen}
+                setMapOpen={setMapOpen}
+              />
             </div>
           </div>
         </div>

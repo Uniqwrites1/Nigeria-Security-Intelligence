@@ -14,14 +14,15 @@ type ToastProps = BaseToastProps & {
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
 
-type ToasterToast = ToastProps & {
+type ToasterToast = {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: ToastActionElement;
-} & {
-  title?: React.ReactNode;
-  description?: React.ReactNode;
+  variant?: 'default' | 'destructive';
+  duration?: number;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 const actionTypes = {
@@ -147,11 +148,11 @@ function dispatch(action: Action) {
 }
 
 type Toast = Omit<ToasterToast, 'id'> & {
-  title?: React.ReactNode;
-  description?: React.ReactNode;
+  title?: React.ReactNode | string;
+  description?: React.ReactNode | string;
 };
 
-function toast({ ...props }: Toast) {
+function toast(props: Toast) {
   const id = genId();
 
   const update = (props: ToasterToast) =>

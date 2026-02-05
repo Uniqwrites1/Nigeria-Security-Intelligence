@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { ThreatType, SeverityLevel, Region } from '@/types/security';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,12 @@ interface IncidentFiltersProps {
 }
 
 export function IncidentFilters({ filters, onFilterChange, stats }: IncidentFiltersProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const threatTypes: ThreatType[] = [
     'terrorism',
     'banditry',
@@ -87,7 +94,7 @@ export function IncidentFilters({ filters, onFilterChange, stats }: IncidentFilt
               onClick={clearFilters}
               className="text-muted-foreground hover:text-foreground"
             >
-              <X className="w-4 h-4 mr-1" />
+              {mounted && <X className="w-4 h-4 mr-1" />}
               Clear all
             </Button>
           )}

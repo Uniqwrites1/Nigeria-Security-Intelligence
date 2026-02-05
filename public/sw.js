@@ -94,7 +94,8 @@ async function networkFirst(request) {
   try {
     const response = await fetch(request);
     
-    if (response.ok) {
+    // Only cache full responses (status 200), not partial (206)
+    if (response.ok && response.status === 200) {
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, response.clone());
     }
@@ -130,7 +131,8 @@ async function cacheFirst(request) {
   try {
     const response = await fetch(request);
     
-    if (response.ok) {
+    // Only cache full responses (status 200), not partial (206)
+    if (response.ok && response.status === 200) {
       const cache = await caches.open(STATIC_CACHE);
       cache.put(request, response.clone());
     }
@@ -148,7 +150,8 @@ async function staleWhileRevalidate(request) {
   const cached = await cache.match(request);
   
   const fetchPromise = fetch(request).then((response) => {
-    if (response.ok) {
+    // Only cache full responses (status 200), not partial (206)
+    if (response.ok && response.status === 200) {
       cache.put(request, response.clone());
     }
     return response;

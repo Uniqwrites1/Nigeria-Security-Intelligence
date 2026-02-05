@@ -72,8 +72,10 @@ export function NotificationSettings() {
   const [config, setConfig] = useState<AlertConfig>(getDefaultConfig());
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     setConfig(getConfig());
   }, [getConfig]);
 
@@ -116,7 +118,7 @@ export function NotificationSettings() {
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto bg-background">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto bg-background" suppressHydrationWarning>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bell className="w-5 h-5" />

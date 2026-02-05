@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { ClusteredIncident, SeverityLevel } from '@/types/security';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -11,6 +11,7 @@ import {
   ToastTitle, 
   ToastViewport 
 } from '@/components/ui/toast';
+import { Badge as BadgeUI } from '@/components/ui/badge';
 import { 
   AlertTriangle, 
   AlertOctagon, 
@@ -34,7 +35,12 @@ export function NotificationToast({
   maxVisible = 3,
   position = 'bottom-right',
 }: NotificationToastProps) {
+  const [mounted, setMounted] = useState(false);
   const { toasts, dismiss, toast: showToast } = useToast();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const getSeverityIcon = useCallback((severity: SeverityLevel) => {
     switch (severity) {
@@ -94,7 +100,7 @@ export function NotificationToast({
 
   // Show toast when new incidents arrive
   useEffect(() => {
-    if (!enabled || incidents.length === 0) return;
+    if (!mounted || !enabled || incidents.length === 0) return;
 
     // Get new incidents (that haven't been shown)
     const newIncidents = incidents.slice(0, maxVisible);
@@ -113,11 +119,11 @@ export function NotificationToast({
               <span className="uppercase text-xs font-bold tracking-wider">
                 {incident.severity}
               </span>
-              <Badge className={cn('text-xs', styles.badge)}>
+              <BadgeUI className={cn('text-xs', styles.badge)}>
                 {incident.threatType.replace('_', ' ')}
-              </Badge>
+              </BadgeUI>
             </div>
-          ) as any,
+          ),
           description: (
             <div className="mt-2 space-y-2">
               <p className="font-medium text-foreground line-clamp-2">
@@ -136,13 +142,13 @@ export function NotificationToast({
                 </span>
               </div>
             </div>
-          ) as any,
+          ),
           variant: incident.severity === 'critical' ? 'destructive' : 'default',
           duration: incident.severity === 'critical' ? 10000 : 6000,
         });
       }, index * 500);
     });
-  }, [incidents, enabled, maxVisible, showToast, getSeverityStyles, getSeverityIcon, formatTime]);
+  }, [mounted, incidents, enabled, maxVisible, showToast, getSeverityStyles, getSeverityIcon, formatTime]);
 
   const positionClasses = {
     'top-right': 'fixed top-0 right-0',
@@ -151,44 +157,40 @@ export function NotificationToast({
     'bottom-left': 'fixed bottom-0 left-0',
   };
 
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <ToastProvider>
       <div className={cn('z-[100] m-4 space-y-2', positionClasses[position])}>
-        {toasts.map((toastItem) => (
-          <Toast 
-            key={toastItem.id} 
-            {...toastItem}
-            className={cn(
-              'w-[350px] shadow-lg',
-              // Add custom styling for severity
-              toastItem.variant === 'destructive' && 'border-l-4 border-l-red-500'
-            )}
-          >
-            <div className="grid gap-1">
-              <ToastTitle>{toastItem.title}</ToastTitle>
-              {toastItem.description && (
-                <ToastDescription>{toastItem.description}</ToastDescription>
+        {toasts.map((toastItem) => {
+          // Extract title and description from the toast item
+          const { title, description, ...toastProps } = toastItem;
+          return (
+            <Toast 
+              key={toastItem.id} 
+              {...toastProps}
+              className={cn(
+                'w-[350px] shadow-lg',
+                // Add custom styling for severity
+                toastItem.variant === 'destructive' && 'border-l-4 border-l-red-500'
               )}
-            </div>
-            {toastItem.action}
-            <ToastClose />
-          </Toast>
-        ))}
+            >
+              <div className="grid gap-1">
+                {title && <ToastTitle>{title}</ToastTitle>}
+                {description && (
+                  <ToastDescription>{description}</ToastDescription>
+                )}
+              </div>
+              {toastProps.action}
+              <ToastClose />
+            </Toast>
+          );
+        })}
         <ToastViewport />
       </div>
     </ToastProvider>
-  );
-}
-
-// Badge helper component
-function Badge({ className, children }: { className?: string; children: React.ReactNode }) {
-  return (
-    <span className={cn(
-      'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
-      className
-    )}>
-      {children}
-    </span>
   );
 }
 
