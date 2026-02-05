@@ -45,17 +45,6 @@ export function PWAInstallPrompt({
     setMounted(true);
   }, []);
 
-  // Don't show if already installed
-  if (isInstalled) {
-    return null;
-  }
-
-  // Don't render until mounted (hydration safety)
-  if (!mounted) {
-    return null;
-  }
-
-  // Auto-show after delay if not manually closed and has installability
   useEffect(() => {
     if (!hasManuallyClosed && !isOpen && !isInstalled) {
       const timer = setTimeout(() => {
@@ -68,6 +57,16 @@ export function PWAInstallPrompt({
       return () => clearTimeout(timer);
     }
   }, [delay, hasManuallyClosed, isOpen, isInstalled, isInstallable, isPromptActive]);
+
+  // Don't show if already installed
+  if (isInstalled) {
+    return null;
+  }
+
+  // Don't render until mounted (hydration safety)
+  if (!mounted) {
+    return null;
+  }
 
   // Don't show if prompt was dismissed (only for manual dismiss)
   if (hasManuallyClosed && !isOpen) {
