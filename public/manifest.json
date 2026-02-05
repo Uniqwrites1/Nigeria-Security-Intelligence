@@ -1,6 +1,6 @@
 {
-  "name": "Nigeria Security Intelligence",
-  "short_name": "Security Intel",
+  "name": "SECtrack",
+  "short_name": "SECtrack",
   "description": "Real-time security monitoring across all 36 states + FCT",
   "start_url": "/",
   "display": "standalone",

@@ -30,7 +30,7 @@ interface PWAInstallPromptProps {
 }
 
 export function PWAInstallPrompt({
-  title = 'Install Nigeria Security Intel',
+  title = 'Install SECtrack',
   description = 'Get real-time security alerts and access the dashboard offline by installing our app.',
   delay = 5000,
   position = 'bottom',

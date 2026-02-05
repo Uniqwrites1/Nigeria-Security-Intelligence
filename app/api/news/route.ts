@@ -36,6 +36,13 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const source = searchParams.get('source') || 'all';
     const limit = parseInt(searchParams.get('limit') || '50', 10);
+    
+    // Add cache control headers for real-time data
+    const headers = {
+      'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    };
 
     const incidents: SecurityIncident[] = [];
 
@@ -61,6 +68,13 @@ export async function GET(request: NextRequest) {
     const uniqueIncidents = removeDuplicates(securityIncidents);
 
     const clustered = clusterIncidents(uniqueIncidents);
+    
+    // Sort by published date (newest first)
+    clustered.sort((a, b) => {
+      const dateA = new Date(a.firstReported).getTime();
+      const dateB = new Date(b.firstReported).getTime();
+      return dateB - dateA;
+    });
 
     const limited = clustered.slice(0, limit);
 
@@ -73,7 +87,7 @@ export async function GET(request: NextRequest) {
         clustered: limited.length,
         lastUpdated: new Date().toISOString(),
       }
-    });
+    }, { headers });
   } catch (error) {
     console.error('News aggregation error:', error);
     return NextResponse.json(
@@ -92,9 +106,13 @@ async function fetchFromNewsAPI(): Promise<SecurityIncident[]> {
 
   try {
     const securityKeywords = 'security OR attack OR terrorism OR kidnapping OR banditry OR violence OR military';
+    // Don't use date filter - let the API sort by publishedAt to get the latest
     const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(securityKeywords)}&language=en&domains=premiumtimesng.com,punchng.com,vanguardngr.com,dailytrust.com,channelstv.com,saharareporters.com,leadership.ng,guardian.ng,bellanaija.com,businessday.ng,nairametrics.com,thenationonlineng.net,techcabal.com,tekedia.com,thisdaylive.com,tvcnews.tv,lindaikejisblog.com&sortBy=publishedAt&pageSize=100&apiKey=${apiKey}`;
 
-    const response = await fetch(url, { next: { revalidate: 60 } });
+    const response = await fetch(url, { 
+      next: { revalidate: 30 },
+      headers: { 'Cache-Control': 'no-cache' }
+    });
 
     if (!response.ok) {
       throw new Error(`NewsAPI error: ${response.status}`);
@@ -120,9 +138,13 @@ async function fetchFromGNews(): Promise<SecurityIncident[]> {
 
   try {
     const securityKeywords = 'security attack terrorism kidnapping banditry violence Nigeria';
+    // Don't use date filter - let the API sort by latest to get the newest articles
     const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(securityKeywords)}&lang=en&country=ng&max=100&apikey=${apiKey}`;
 
-    const response = await fetch(url, { next: { revalidate: 60 } });
+    const response = await fetch(url, { 
+      next: { revalidate: 30 },
+      headers: { 'Cache-Control': 'no-cache' }
+    });
 
     if (!response.ok) {
       throw new Error(`GNews error: ${response.status}`);
@@ -145,7 +167,8 @@ async function fetchFromRSS(): Promise<SecurityIncident[]> {
   const fetchPromises = NIGERIAN_RSS_FEEDS.map(async (feed) => {
     try {
       const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}&api_key=${process.env.RSS2JSON_API_KEY || 'demo'}&count=30`, {
-        next: { revalidate: 60 }
+        next: { revalidate: 30 },
+        headers: { 'Cache-Control': 'no-cache' }
       });
 
       if (!response.ok) return [];

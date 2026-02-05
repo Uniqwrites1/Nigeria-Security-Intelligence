@@ -8,13 +8,13 @@ import { NotificationToast } from '@/components/NotificationToast';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Nigeria Security Intelligence',
+  title: 'SECtrack',
   description: 'Real-time security monitoring across all 36 states + FCT',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Security Intel',
+    title: 'SECtrack',
   },
   formatDetection: {
     telephone: false,
@@ -55,7 +55,7 @@ export default function RootLayout({
         <ServiceWorkerRegistration />
         {children}
         <PWAInstallPrompt 
-          title="Install Security Intel App"
+          title="Install SECtrack App"
           description="Get real-time security alerts and access the dashboard offline by installing our app."
           delay={3000}
         />

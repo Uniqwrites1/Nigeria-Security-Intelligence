@@ -43,8 +43,10 @@ export default function Home() {
   const { isInstallable, isInstalled, triggerInstall } = usePWAInstall();
   
   const { data, error, isLoading, mutate } = useSWR('/api/news?limit=100', fetcher, {
-    refreshInterval: 60000,
+    refreshInterval: 30000,
     revalidateOnFocus: true,
+    revalidateIfStale: true,
+    dedupingInterval: 0,
   });
 
   // Initialize notification alerts
@@ -155,7 +157,7 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <LogoIcon />
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Nigeria Security Intelligence</h1>
+                <h1 className="text-2xl font-bold text-foreground">SECtrack</h1>
                 <p className="text-sm text-muted-foreground">Real-time security monitoring across all 36 states + FCT</p>
               </div>
             </div>
@@ -295,7 +297,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-6">
           <div className="text-center text-sm text-muted-foreground">
             <p>
-              Nigeria Security Intelligence Platform - Aggregating from {data?.meta?.totalIncidents || 0} sources
+              SECtrack - Aggregating from {data?.meta?.totalIncidents || 0} sources
             </p>
             <p className="mt-2">
               Data from NewsAPI, GNews, Premium Times, Punch, Vanguard, Daily Trust, Channels TV, and more
