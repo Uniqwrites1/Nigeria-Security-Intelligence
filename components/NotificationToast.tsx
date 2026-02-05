@@ -148,7 +148,7 @@ export function NotificationToast({
         });
       }, index * 500);
     });
-  }, [mounted, incidents, enabled, maxVisible, showToast, getSeverityStyles, getSeverityIcon, formatTime]);
+  }, [mounted, incidents, enabled, maxVisible, showToast]);
 
   const positionClasses = {
     'top-right': 'fixed top-0 right-0',

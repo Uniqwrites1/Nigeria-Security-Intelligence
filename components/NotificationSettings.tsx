@@ -76,6 +76,9 @@ export function NotificationSettings() {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
     setConfig(getConfig());
   }, [getConfig]);
 
