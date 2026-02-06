@@ -106,12 +106,12 @@ async function fetchFromNewsAPI(): Promise<SecurityIncident[]> {
 
   try {
     const securityKeywords = 'security OR attack OR terrorism OR kidnapping OR banditry OR violence OR military';
-    // Don't use date filter - let the API sort by publishedAt to get the latest
+    // Don't use date filter - let the API return all articles, we'll handle filtering in frontend
     const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(securityKeywords)}&language=en&domains=premiumtimesng.com,punchng.com,vanguardngr.com,dailytrust.com,channelstv.com,saharareporters.com,leadership.ng,guardian.ng,bellanaija.com,businessday.ng,nairametrics.com,thenationonlineng.net,techcabal.com,tekedia.com,thisdaylive.com,tvcnews.tv,lindaikejisblog.com&sortBy=publishedAt&pageSize=100&apiKey=${apiKey}`;
 
     const response = await fetch(url, { 
-      next: { revalidate: 30 },
-      headers: { 'Cache-Control': 'no-cache' }
+      next: { revalidate: 10 },
+      headers: { 'Cache-Control': 'no-cache, must-revalidate' }
     });
 
     if (!response.ok) {
@@ -138,12 +138,12 @@ async function fetchFromGNews(): Promise<SecurityIncident[]> {
 
   try {
     const securityKeywords = 'security attack terrorism kidnapping banditry violence Nigeria';
-    // Don't use date filter - let the API sort by latest to get the newest articles
+    // Don't use date filter - let the API return all articles
     const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(securityKeywords)}&lang=en&country=ng&max=100&apikey=${apiKey}`;
 
     const response = await fetch(url, { 
-      next: { revalidate: 30 },
-      headers: { 'Cache-Control': 'no-cache' }
+      next: { revalidate: 10 },
+      headers: { 'Cache-Control': 'no-cache, must-revalidate' }
     });
 
     if (!response.ok) {

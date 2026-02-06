@@ -3,6 +3,7 @@
 import { useEffect, useCallback, useRef } from 'react';
 import useSWR from 'swr';
 import { useToast } from '@/hooks/use-toast';
+import { formatTime } from '@/lib/formatTime';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { ClusteredIncident, SeverityLevel, AlertConfig, ThreatType } from '@/types/security';
 import { ToastAction } from '@/components/ui/toast';
@@ -119,7 +120,7 @@ export function useNotificationAlerts({
             </p>
           )}
           <p className="text-sm text-muted-foreground mt-1">
-            {new Date(incident.lastUpdated).toLocaleString()}
+            {formatTime(new Date(incident.lastUpdated))}
           </p>
         </div>
       ) as any,

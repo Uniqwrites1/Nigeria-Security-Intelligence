@@ -7,12 +7,11 @@ import { StatsDashboard } from '@/components/stats-dashboard';
 import { NigeriaMap } from '@/components/nigeria-map';
 import { IncidentFeed } from '@/components/incident-feed';
 import { IncidentFilters } from '@/components/incident-filters';
-import { NotificationSettings } from '@/components/NotificationSettings';
 import { useNotificationAlerts } from '@/hooks/useNotificationAlerts';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { Button } from '@/components/ui/button';
 import { HeaderIcons, LogoIcon } from '@/components/header-icons';
-import { NotificationBell } from '@/components/NotificationBell';
+import { formatTime } from '@/lib/formatTime';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { RefreshCw, ChevronUp, ChevronDown } from 'lucide-react';
 
@@ -275,7 +274,7 @@ export default function Home() {
                   <div className="mb-4 flex items-center justify-between">
                     <h2 className="text-xl font-semibold text-foreground">Live Security Feed</h2>
                     <p className="text-sm text-muted-foreground">
-                      Last updated: {data?.meta?.lastUpdated ? new Date(data.meta.lastUpdated).toLocaleString() : 'N/A'}
+                      Last updated: {data?.meta?.lastUpdated ? formatTime(new Date(data.meta.lastUpdated)) : 'N/A'}
                     </p>
                   </div>
 

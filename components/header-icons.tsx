@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { NotificationBell } from '@/components/NotificationBell';
+import { NotificationSettings } from '@/components/NotificationSettings';
 
 interface HeaderIconsProps {
   isDarkMode: boolean | undefined;
@@ -118,6 +120,14 @@ export function HeaderIcons({
 
   return (
     <>
+      {/* Notification Bell & Settings */}
+      {mounted && (
+        <>
+          <NotificationBell />
+          <NotificationSettings />
+        </>
+      )}
+
       {/* Theme Toggle Button */}
       <Button
         variant="outline"

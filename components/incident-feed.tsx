@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Users, MapPin, Clock, ExternalLink, Shield } from 'lucide-react';
 import { format, isValid } from 'date-fns';
+import { formatTime } from '@/lib/formatTime';
 
 interface IncidentFeedProps {
   incidents: ClusteredIncident[];
@@ -34,12 +35,6 @@ function IncidentCard({ incident }: { incident: ClusteredIncident }) {
   };
 
   const lastUpdatedDate = parseDate(incident.lastUpdated);
-  const publishedDate = parseDate(primaryIncident.publishedAt);
-
-  // Format the published date and time as "Jan 21, 2026, 03:30 PM"
-  const getTimeDisplay = (): string => {
-    return format(publishedDate, 'MMM d, yyyy, hh:mm a');
-  };
 
   return (
     <Card className="p-6 bg-card border-border hover:border-slate-300 dark:hover:border-slate-600 transition-all">
@@ -91,7 +86,7 @@ function IncidentCard({ incident }: { incident: ClusteredIncident }) {
 
           <div className="flex items-center gap-2 text-muted-foreground" title={format(lastUpdatedDate, 'PPpp')}>
             <Clock className="w-4 h-4" />
-            <span>{getTimeDisplay()}</span>
+            <span>{formatTime(lastUpdatedDate)}</span>
           </div>
 
           {primaryIncident.casualties && (

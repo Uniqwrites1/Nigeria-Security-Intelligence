@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Bell } from 'lucide-react';
 import useSWR from 'swr';
 import { ClusteredIncident } from '@/types/security';
+import { formatTime } from '@/lib/formatTime';
 import { useToast } from '@/hooks/use-toast';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -244,7 +245,7 @@ export function NotificationBell({ maxNotifications = 5 }: NotificationBellProps
                             {getSeverityLabel(incident.severity)}
                           </span>
                           <span className="text-xs text-gray-500">
-                            • {new Date(incident.lastUpdated).toLocaleTimeString()}
+                            • {formatTime(new Date(incident.lastUpdated))}
                           </span>
                         </div>
                         <p className="text-sm text-white mt-0.5 truncate">
